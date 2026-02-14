@@ -77,20 +77,91 @@ amharic-braille-opencv/
 3. **Classification**: A convolutional neural network classifies each character
 4. **Output**: The system returns the detected text in Amharic
 
+![Pipeline Visualization](complete_pipeline_demo.png)
+
+The image above shows the complete detection pipeline:
+- Original input image with Braille characters
+- Deskewed and corrected document
+- Binary image showing detected Braille dots
+- Character segmentation with bounding boxes
+- Individual extracted characters ready for classification
+
 ## Development
 
 The project includes Jupyter notebooks for interactive development:
 - `braille_preprocessing.ipynb`: Preprocessing experiments
 - `braille_segmentation.ipynb`: Segmentation development
 - `braille_classification.ipynb`: Model training and evaluation
+- `demo.ipynb`: Complete pipeline demonstration with examples
+
+### Running the Demo Notebook
+
+To try the system interactively:
+
+```bash
+jupyter notebook demo.ipynb
+```
+
+The demo notebook shows:
+- Step-by-step pipeline execution
+- Visualization of each processing stage
+- Individual character extraction
+- Batch processing examples
 
 ## Requirements
 
 - Python 3.7+
 - OpenCV 4.x
 - NumPy
-- TensorFlow/Keras
+- TensorFlow 2.8+
 - Matplotlib
+- Pillow
+- scikit-learn
+
+## System Architecture
+
+The system consists of four main components:
+
+1. **BraillePreprocessor**: Handles image preprocessing
+   - Noise reduction using Gaussian and bilateral filters
+   - CLAHE for contrast enhancement
+   - Paper region detection and isolation
+   - Perspective correction using homography
+   - Adaptive thresholding for binarization
+
+2. **BrailleSegmenter**: Segments individual characters
+   - Contour-based dot detection
+   - Hierarchical grouping (dots → rows → letters)
+   - Bounding box extraction
+   - Configurable spacing thresholds
+
+3. **BrailleClassifier**: CNN-based character classification
+   - 3-layer CNN architecture
+   - Batch normalization and dropout for regularization
+   - Supports 38 Amharic characters
+   - Training, evaluation, and inference methods
+
+4. **BrailleDetector**: End-to-end pipeline integration
+   - Combines all components
+   - Single image and batch processing
+   - Intermediate result visualization
+   - Command-line interface
+
+## Model Architecture
+
+The CNN classifier uses the following architecture:
+
+```
+Input (64x64x1)
+→ Conv2D(32) + BatchNorm + Conv2D(32) + BatchNorm + MaxPool + Dropout(0.25)
+→ Conv2D(64) + BatchNorm + Conv2D(64) + BatchNorm + MaxPool + Dropout(0.25)
+→ Conv2D(128) + BatchNorm + Conv2D(128) + BatchNorm + MaxPool + Dropout(0.25)
+→ Dense(256) + BatchNorm + Dropout(0.5)
+→ Dense(128) + BatchNorm + Dropout(0.5)
+→ Dense(38, softmax)
+```
+
+**Note**: The model requires training with labeled Amharic Braille data. The current implementation provides the architecture and training pipeline.
 
 ## Contributing
 
